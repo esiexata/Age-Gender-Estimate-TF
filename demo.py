@@ -59,12 +59,19 @@ def main(sess, age, gender, train_mode, images_pl):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     if webcam == True:
+        criancaM = 0
+        adolecenteM = 0
+        jovemM = 0
+        adultoM = 0
+        idosoM = 0
 
-        jovem = 0
-        meiaIdade = 0
-        idoso = 0
+        criancaF = 0
+        adolecenteF = 0
+        jovemF = 0
+        adultoF = 0
+        idosoF = 0
 
-        for i in range (0,50):
+        for i in range (0,200):
             ret, img = cap.read()
             if not ret:
                 print("error: failed to capture image")
@@ -97,18 +104,43 @@ def main(sess, age, gender, train_mode, images_pl):
                 label = "{}, {}".format(int(ages[i]), "F" if genders[i] == 0 else "M")
                 draw_label(img, (d.left(), d.top()), label)
 
-                if ages[i] <= 20:
-                    jovem = jovem + 1
+                if ages[i] <= 12 and genders[i] == 1:
+                    criancaM = criancaM + 1
 
-                elif ages[i] > 20 and ages[i] < 40:
-                    meiaIdade = meiaIdade + 1
+                elif ages[i] > 12 and ages[i] <= 16 and genders[i] == 1:
+                    adolecenteM = adolecenteM + 1
 
-                elif ages[i] >= 40:
-                    idoso = idoso + 1
+                elif ages[i] > 16 and ages[i] <= 25 and genders[i] == 1:
+                    jovemM = jovemM + 1
 
-                print(jovem, meiaIdade, idoso)
-            rangesF = [jovem, meiaIdade, idoso, 0, 0]
-            rangesM = rangesF
+                elif ages[i] > 25 and ages[i] <= 55 and genders[i] == 1:
+                    adultoM = adultoM + 1
+
+                elif ages[i] > 55 and genders[i] == 1:
+                    idosoM = idosoM + 1
+
+                print("Totalizadores Masculino: ""criancas ", criancaM, "adolecente ", adolecenteM, "jovens ", jovemM,
+                      "adulto ", adultoM, "idosos ", idosoM)
+                rangesM = [criancaM, adolecenteM, jovemM, adultoM, idosoM]
+
+                if ages[i] <= 12 and genders[i] == 0:
+                    criancaF = criancaF + 1
+
+                elif ages[i] > 12 and ages[i] <= 16 and genders[i] == 0:
+                    adolecenteF = adolecenteF + 1
+
+                elif ages[i] > 16 and ages[i] <= 25 and genders[i] == 0:
+                    jovemF = jovemF + 1
+
+                elif ages[i] > 25 and ages[i] <= 55 and genders[i] == 0:
+                    adultoF = adultoF + 1
+
+                elif ages[i] > 55 and genders[i] == 0:
+                    idosoF = idosoF + 1
+
+                print("Totalizadores Feminino: ""criancas ", criancaF, "adolecente ", adolecenteF, "jovens ", jovemF,
+                      "adulto ", adultoF, "idosos ", idosoF)
+                rangesF = [criancaF, adolecenteF, jovemF, adultoF, idosoF]
 
             cv2.imshow("result", img)
 
@@ -116,12 +148,20 @@ def main(sess, age, gender, train_mode, images_pl):
 
             if key == 27:
                 break
-    graphbar(rangesF, rangesM)
+        graphbar(rangesF, rangesM)
 
     if webcam == False:
-        jovem = 0
-        meiaIdade = 0
-        idoso = 0
+        criancaM = 0
+        adolecenteM = 0
+        jovemM = 0
+        adultoM = 0
+        idosoM = 0
+
+        criancaF = 0
+        adolecenteF = 0
+        jovemF = 0
+        adultoF = 0
+        idosoF = 0
 
         ret = True
         for _, _, arquivo in os.walk(path):
@@ -159,20 +199,44 @@ def main(sess, age, gender, train_mode, images_pl):
                 label = "{}, {}".format(int(ages[i]), "F" if genders[i] == 0 else "M")
                 draw_label(img, (d.left(), d.top()), label)
 
-                if ages[i] <= 20:
-                    jovem = jovem + 1
+                if ages[i] <= 12 and genders[i] ==1:
+                    criancaM = criancaM + 1
 
-                elif ages[i] > 20 and ages[i] < 35:
-                    meiaIdade = meiaIdade + 1
+                elif ages[i] > 12 and ages[i] <= 16 and genders[i] ==1:
+                    adolecenteM = adolecenteM + 1
 
-                elif ages[i] >= 35:
-                    idoso = idoso + 1
+                elif ages[i] > 16 and ages[i] <= 25 and genders[i] ==1:
+                    jovemM = jovemM + 1
 
-                print(jovem, meiaIdade, idoso)
-                rangesF = [jovem, meiaIdade, idoso, 0, 0]
-                rangesM = rangesF
+                elif ages[i] > 25 and ages[i] <= 55 and genders[i] ==1:
+                    adultoM = adultoM + 1
 
-            cv2.imshow("result", img)
+                elif ages[i] > 55 and genders[i] ==1:
+                    idosoM = idosoM + 1
+
+                print("Totalizadores Masculino: ""criancas ",criancaM,"adolecente ",adolecenteM,"jovens ",jovemM, "adulto ",adultoM,"idosos ", idosoM)
+                rangesM = [criancaM,adolecenteM,jovemM, adultoM,idosoM]
+
+                if ages[i] <= 12 and genders[i] == 0:
+                    criancaF = criancaF + 1
+
+                elif ages[i] > 12 and ages[i] <= 16 and genders[i] == 0:
+                    adolecenteF = adolecenteF + 1
+
+                elif ages[i] > 16 and ages[i] <= 25 and genders[i] == 0:
+                    jovemF = jovemF + 1
+
+                elif ages[i] > 25 and ages[i] <= 55 and genders[i] == 0:
+                    adultoF = adultoF + 1
+
+                elif ages[i] > 55 and genders[i] == 0:
+                    idosoF = idosoF + 1
+
+                print("Totalizadores Feminino: ""criancas ", criancaF, "adolecente ", adolecenteF, "jovens ", jovemF, "adulto ", adultoF, "idosos ", idosoF)
+                rangesF = [criancaF, adolecenteF, jovemF, adultoF, idosoF]
+
+
+            cv2.imshow("resultado", img)
 
 
             key = cv2.waitKey(1)

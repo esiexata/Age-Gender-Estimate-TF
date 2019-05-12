@@ -31,18 +31,18 @@ def graphbar(rangesF,rangesM):
     rects1 = ax.bar(index, means_men, bar_width,
                     alpha=opacity, color='b',
                     yerr=std_men, error_kw=error_config,
-                    label='Men')
+                    label='Homens')
 
     rects2 = ax.bar(index + bar_width, means_women, bar_width,
                     alpha=opacity, color='r',
                     yerr=std_women, error_kw=error_config,
-                    label='Women')
+                    label='Mulheres')
 
-    ax.set_xlabel('Group')
-    ax.set_ylabel('Scores')
-    ax.set_title('Scores by group and gender')
+    ax.set_xlabel('Grupos')
+    ax.set_ylabel('Quantidades')
+    ax.set_title('QUantidade por grupos de Homens e Mulheres')
     ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(('A', 'B', 'C', 'D', 'E'))
+    ax.set_xticklabels(('0-12', '13-16', '17-25', '26-55', '56-100'))
     ax.legend()
 
     fig.tight_layout()

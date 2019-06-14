@@ -24,7 +24,7 @@ def get_args():
                         help="width of network")
     parser.add_argument("--folder", type=str, default=path,
                         help="folder com fotos")
-    parser.add_argument("--webcam", type=bool, default=True,
+    parser.add_argument("--webcam", type=bool, default=False,
                         help="captura faces com webcam")
     args = parser.parse_args()
     return args
@@ -169,6 +169,9 @@ def main(sess, age, gender, train_mode, images_pl):
 
         for z in range(0, len(arquivo)):
             print(arquivo[z])
+
+
+
             img = cv2.imread(path + "/" + arquivo[z])
 
             input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

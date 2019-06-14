@@ -40,7 +40,7 @@ def graphbar(rangesF,rangesM):
 
     ax.set_xlabel('Grupos')
     ax.set_ylabel('Quantidades')
-    ax.set_title('QUantidade por grupos de Homens e Mulheres')
+    ax.set_title('Quantidade por grupos de Homens e Mulheres')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(('0-12', '13-16', '17-25', '26-55', '56-100'))
     ax.legend()

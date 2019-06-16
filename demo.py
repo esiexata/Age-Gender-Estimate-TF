@@ -8,6 +8,10 @@ import tensorflow as tf
 from imutils.face_utils import FaceAligner
 from imutils.face_utils import rect_to_bb
 from graphs import graphbar
+from datetime import date
+
+import db
+import math
 
 path = 'face_database/2002/07/19/big'
 
@@ -197,10 +201,28 @@ def main(sess, age, gender, train_mode, images_pl):
                 # predict ages and genders of the detected faces
                 ages, genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
 
+
                 # draw results
             for i, d in enumerate(detected):
                 label = "{}, {}".format(int(ages[i]), "F" if genders[i] == 0 else "M")
                 draw_label(img, (d.left(), d.top()), label)
+                #insert data in to db
+
+                data_atual = date.today()
+                print(data_atual)
+                type(ages[i])
+
+                idade=math.floor(ages[i])
+                print (idade)
+
+
+                genero = (genders[i])
+
+                #db.teste(data_atual, idade, genero)
+
+
+                db.insert_age_gender(data_atual, idade, genero)
+
 
                 if ages[i] <= 12 and genders[i] ==1:
                     criancaM = criancaM + 1

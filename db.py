@@ -1,22 +1,49 @@
 import psycopg2
-con = psycopg2.connect(host='localhost', database='teste',user='alo', password='esiAdmins2005')
-cur = con.cursor()
 
-sql = 'create table agegender5 (id serial primary key, data DATE , age integer,sex boolean,etiny varchar(30),disp integer)'
-#cur.execute(sql)
+def teste (date, age, gender):
+    print("campos a serem inseridos", date, age, gender)
 
 
-sql = "insert into agegender5 values (default,'12/12/1999','30','1','white','2')"
-cur.execute(sql)
 
-#cur.execute('delete from agegender5')
-con.commit()
+def insert_age_gender(date, age, gender):
 
-cur.execute('select * from agegender5')
-recset = cur.fetchall()
-for rec in recset:
-    print (rec)
+    if gender == 1:
+        gender = True
+    else:
+        gender = False
 
-con.close()
+    try:
+        connection = psycopg2.connect(user="alo",
+                                      password="esiAdmins2005",
+                                      host="127.0.0.1",
+                                      port="5432",
+                                      database="teste")
+        cursor = connection.cursor()
+        postgres_insert_query = """ INSERT INTO agegender5 ( data, age, sex, etiny, disp) VALUES (%s,%s,%s,%s,%s)"""
+        # cursor.execute('delete from agegender5')
+        print("campos a serem inseridos", date, age, gender)
+
+        record_to_insert = (str(date), int(age), gender, 'none', '10')
+        cursor.execute(postgres_insert_query, record_to_insert)
+        connection.commit()
+        count = cursor.rowcount
+        print(count, "insrerido com sucesso")
+    except (Exception, psycopg2.Error) as error:
+        if (connection):
+            print("Failed to insert record into database", error)
+            return 1
+    finally:
+        cursor.execute('select * from agegender5')
+        recset = cursor.fetchall()
+        for rec in recset:
+            print(rec)
+        # closing database connection.
+        if (connection):
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+    return 0
 
 
+#insert_age_gender('10/01/2015', 10, True)

@@ -12,6 +12,8 @@ from datetime import date
 
 import db
 import math
+import time
+import base64
 
 path = 'face_database/2002/07/19/big'
 
@@ -153,6 +155,9 @@ def main(sess, age, gender, train_mode, images_pl):
             if key == 27:
                 break
         graphbar(rangesF, rangesM)
+#------------------------------------------------------------------------------------------------------
+# ----------------------faz a prediçao das imagens em uma pasta ---------------------------------------
+
 
     if webcam == False:
         criancaM = 0
@@ -174,8 +179,6 @@ def main(sess, age, gender, train_mode, images_pl):
         for z in range(0, len(arquivo)):
             print(arquivo[z])
 
-
-
             img = cv2.imread(path + "/" + arquivo[z])
 
             input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -192,9 +195,21 @@ def main(sess, age, gender, train_mode, images_pl):
                 yw1 = max(int(y1 - 0.4 * h), 0)
                 xw2 = min(int(x2 + 0.4 * w), img_w - 1)
                 yw2 = min(int(y2 + 0.4 * h), img_h - 1)
+
+                if y1 < 0 or y2 < 0 or x1 < 0 or x2 < 0:
+                    print ("posiçao menor que 0")
+                else:
+                    roi = img[y1:y2, x1:x2]
+                    cv2.imshow("roi",roi)
+                    timestamp = str(time.time())
+                    imgsave = "imgs/roi"+timestamp+".png"
+                    cv2.imwrite(imgsave, roi)
                 cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
                 # cv2.rectangle(img, (xw1, yw1), (xw2, yw2), (255, 0, 0), 2)
                 faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
+
+
+
                 # faces[i,:,:,:] = cv2.resize(img[yw1:yw2 + 1, xw1:xw2 + 1, :], (img_size, img_size))
                 #
             if len(detected) > 0:
@@ -204,26 +219,19 @@ def main(sess, age, gender, train_mode, images_pl):
 
                 # draw results
             for i, d in enumerate(detected):
+
                 label = "{}, {}".format(int(ages[i]), "F" if genders[i] == 0 else "M")
                 draw_label(img, (d.left(), d.top()), label)
+
+
                 #insert data in to db
-
                 data_atual = date.today()
-                print(data_atual)
-                type(ages[i])
-
                 idade=math.floor(ages[i])
-                print (idade)
-
-
                 genero = (genders[i])
-
-                #db.teste(data_atual, idade, genero)
-
 
                 db.insert_age_gender(data_atual, idade, genero)
 
-
+                # filtra os dados em ranges de idades
                 if ages[i] <= 12 and genders[i] ==1:
                     criancaM = criancaM + 1
 

@@ -1,5 +1,35 @@
 import tensorflow as tf
 import os
+from datetime import datetime, tzinfo, timedelta
+import base64
+import numpy as np
+
+import pickle
+from io import BytesIO
+from PIL import Image
+
+
+def convertto64 (npimg):
+    pil_img = Image.fromarray(npimg)
+    buff = BytesIO()
+    pil_img.save(buff, format="png")
+    imgbase64 = base64.b64encode(buff.getvalue()).decode("utf-8")
+
+    return imgbase64
+
+def decodefrom64 (img64):
+    base64_image_string = img64
+    image = Image.open(BytesIO(base64.b64decode(base64_image_string)))
+    img = np.array(image)
+    return img
+
+
+
+
+
+
+
+
 
 
 def read_and_decode(filename_queue):
@@ -106,3 +136,7 @@ def get_files_name(path):
     #         if mean_error_age<best_age_mae:
     #             best_age_mae,best_age_idx = mean_error_age,idx
     #     return best_gender_acc,ckpt.all_model_checkpoint_paths[best_gender_idx],best_age_mae,ckpt.all_model_checkpoint_paths[best_age_idx],sess
+
+
+
+

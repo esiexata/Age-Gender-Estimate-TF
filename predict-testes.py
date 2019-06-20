@@ -8,14 +8,14 @@ import tensorflow as tf
 from imutils.face_utils import FaceAligner
 from imutils.face_utils import rect_to_bb
 from graphs import graphbar
-from datetime import date
+from datetime import datetime
 
 import db
 import math
 import time
-import base64
+import utils
 
-path = 'face_database/2002/07/19/big'
+path = 'face_database/2002/07/21/big'
 
 
 def get_args():
@@ -77,7 +77,7 @@ def main(sess, age, gender, train_mode, images_pl):
         adultoF = 0
         idosoF = 0
 
-        for i in range (0,200):
+        for i in range(0, 200):
             ret, img = cap.read()
             if not ret:
                 print("error: failed to capture image")
@@ -155,9 +155,8 @@ def main(sess, age, gender, train_mode, images_pl):
             if key == 27:
                 break
         graphbar(rangesF, rangesM)
-#------------------------------------------------------------------------------------------------------
-# ----------------------faz a prediçao das imagens em uma pasta ---------------------------------------
-
+    # ------------------------------------------------------------------------------------------------------
+    # ----------------------faz a prediçao das imagens em uma pasta ---------------------------------------
 
     if webcam == False:
         criancaM = 0
@@ -197,18 +196,31 @@ def main(sess, age, gender, train_mode, images_pl):
                 yw2 = min(int(y2 + 0.4 * h), img_h - 1)
 
                 if y1 < 0 or y2 < 0 or x1 < 0 or x2 < 0:
-                    print ("posiçao menor que 0")
+                    print("posiçao menor que 0")
                 else:
+
                     roi = img[y1:y2, x1:x2]
-                    cv2.imshow("roi",roi)
+                    cv2.imshow("roi", roi)
                     timestamp = str(time.time())
-                    imgsave = "imgs/roi"+timestamp+".png"
-                    cv2.imwrite(imgsave, roi)
+
+                    imgsave = "imgs/roi" + timestamp + ".png"
+                    # cv2.imwrite(imgsave, roi)
+
+                    imgbase64 = utils.convertto64(roi)
+
+                    imgbase64array = []
+                    imgbase64array.insert(i, imgbase64)
+
+                    print("tamanho da imagem base64", len(imgbase64))
+
+                    #-----salva imagem de base64 para png
+                    # imgfrom64 = utils.decodefrom64(imgbase64)
+                    # imgsave = "imgs/save64" + timestamp + ".png"
+                    # cv2.imwrite(imgsave, imgfrom64)
+
                 cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
                 # cv2.rectangle(img, (xw1, yw1), (xw2, yw2), (255, 0, 0), 2)
                 faces[i, :, :, :] = fa.align(input_img, gray, detected[i])
-
-
 
                 # faces[i,:,:,:] = cv2.resize(img[yw1:yw2 + 1, xw1:xw2 + 1, :], (img_size, img_size))
                 #
@@ -216,39 +228,41 @@ def main(sess, age, gender, train_mode, images_pl):
                 # predict ages and genders of the detected faces
                 ages, genders = sess.run([age, gender], feed_dict={images_pl: faces, train_mode: False})
 
-
                 # draw results
             for i, d in enumerate(detected):
 
                 label = "{}, {}".format(int(ages[i]), "F" if genders[i] == 0 else "M")
                 draw_label(img, (d.left(), d.top()), label)
 
+                # insert data in to db
+                data_atual = datetime.now()
+                print(data_atual)
 
-                #insert data in to db
-                data_atual = date.today()
-                idade=math.floor(ages[i])
+                idade = math.floor(ages[i])
                 genero = (genders[i])
 
-                db.insert_age_gender(data_atual, idade, genero)
+                db.insert_age_gender(data_atual, idade, genero, imgbase64array[i])
+                time.sleep(5)
 
                 # filtra os dados em ranges de idades
-                if ages[i] <= 12 and genders[i] ==1:
+                if ages[i] <= 12 and genders[i] == 1:
                     criancaM = criancaM + 1
 
-                elif ages[i] > 12 and ages[i] <= 16 and genders[i] ==1:
+                elif ages[i] > 12 and ages[i] <= 16 and genders[i] == 1:
                     adolecenteM = adolecenteM + 1
 
-                elif ages[i] > 16 and ages[i] <= 25 and genders[i] ==1:
+                elif ages[i] > 16 and ages[i] <= 25 and genders[i] == 1:
                     jovemM = jovemM + 1
 
-                elif ages[i] > 25 and ages[i] <= 55 and genders[i] ==1:
+                elif ages[i] > 25 and ages[i] <= 55 and genders[i] == 1:
                     adultoM = adultoM + 1
 
-                elif ages[i] > 55 and genders[i] ==1:
+                elif ages[i] > 55 and genders[i] == 1:
                     idosoM = idosoM + 1
 
-                print("Totalizadores Masculino: ""criancas ",criancaM,"adolecente ",adolecenteM,"jovens ",jovemM, "adulto ",adultoM,"idosos ", idosoM)
-                rangesM = [criancaM,adolecenteM,jovemM, adultoM,idosoM]
+                print("Totalizadores Masculino: ""criancas ", criancaM, "adolecente ", adolecenteM, "jovens ", jovemM,
+                      "adulto ", adultoM, "idosos ", idosoM)
+                rangesM = [criancaM, adolecenteM, jovemM, adultoM, idosoM]
 
                 if ages[i] <= 12 and genders[i] == 0:
                     criancaF = criancaF + 1
@@ -265,12 +279,11 @@ def main(sess, age, gender, train_mode, images_pl):
                 elif ages[i] > 55 and genders[i] == 0:
                     idosoF = idosoF + 1
 
-                print("Totalizadores Feminino: ""criancas ", criancaF, "adolecente ", adolecenteF, "jovens ", jovemF, "adulto ", adultoF, "idosos ", idosoF)
+                print("Totalizadores Feminino: ""criancas ", criancaF, "adolecente ", adolecenteF, "jovens ", jovemF,
+                      "adulto ", adultoF, "idosos ", idosoF)
                 rangesF = [criancaF, adolecenteF, jovemF, adultoF, idosoF]
 
-
             cv2.imshow("resultado", img)
-
 
             key = cv2.waitKey(1)
 
@@ -278,6 +291,8 @@ def main(sess, age, gender, train_mode, images_pl):
                 break
 
     graphbar(rangesF, rangesM)
+    db.list_rows()
+
 
 def load_network(model_path):
     sess = tf.Session()
